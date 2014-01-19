@@ -1,13 +1,14 @@
-# Compiled Object files
-*.slo
-*.lo
-*.o
+# Ignore File for Matlab
+# https://github.com/github/gitignore/blob/master/Global/Matlab.gitignore
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
+# Windows default autosave extension
+*.asv
 
-# Compiled Static libraries
-*.lai
-*.la
-*.a
+# OSX / *nix default autosave extension
+*.m~
+
+# Compiled MEX binaries (all platforms)
+*.mex*
+
+# Simulink Code Generation
+slprj/
