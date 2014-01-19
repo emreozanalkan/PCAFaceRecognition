@@ -31,9 +31,14 @@ end
 pfo.saveDMatrix(D_matrix);
 save('D_matrix.mat','D_matrix');
 k = 100;
+display('Calculating Sigma...');
 Sigma = 1/(length(fileNames)-1) .* D_matrix' * D_matrix;
 save('Sigma.mat','Sigma');
+display('Starting SVD process. This may take several minutes. Please wait...');
+tic;
 [U,S,V] = svd(Sigma);
+display('Total time for SVD: ');
+toc;
 Phi = V(:,1:k);
 save('Phi.mat','Phi');
 PCAspace = D_matrix*Phi;

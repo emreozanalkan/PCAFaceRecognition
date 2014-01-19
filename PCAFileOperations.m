@@ -159,11 +159,12 @@ classdef PCAFileOperations
         end
         
         function [] = saveNormalizedImage(image, fileName)
+            display(['Normalized Image: ' fileName ' is saving...']);
            imwrite(image, [PCAFileOperations.normalizedSetFolderPath filesep fileName]); 
         end
         
         function [fileNameList] = getTrainingSetImageNameList()
-            imageFileList = dir([PCAFileOperations.traningSetFolderPath filesep '*.jpg']);
+            imageFileList = dir([PCAFileOperations.traningSetFolderPath filesep '*.JPG']);
             fileNameList = {imageFileList.name}';
         end
         
