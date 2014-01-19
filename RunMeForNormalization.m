@@ -28,4 +28,5 @@ for i=1:length(fileNames)
     D_matrix(i, :) = reshape(normImg, 1, 4096);
 end
 
-pfo.saveDMatrix(saveDMatrix);
+pfo.saveDMatrix(D_matrix);
+Sigma = 1/(length(fileNames)-1) .* D_matrix' * D_matrix;

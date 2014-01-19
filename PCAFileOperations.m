@@ -170,9 +170,9 @@ classdef PCAFileOperations
         
         function [] = saveFbar(Fbar)
             if isunix
-                dlmwrite(PCAFileOperations.normalizedFbarResult, Fbar, 'delimiter', ' ', 'newline', 'unix');
+                dlmwrite(PCAFileOperations.normalizedFbarPath, Fbar, 'delimiter', ' ', 'newline', 'unix');
             else
-                dlmwrite(PCAFileOperations.normalizedFbarResult, Fbar, 'delimiter', ' ', 'newline', 'pc');
+                dlmwrite(PCAFileOperations.normalizedFbarPath, Fbar, 'delimiter', ' ', 'newline', 'pc');
             end
         end
         
