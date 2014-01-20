@@ -4,6 +4,7 @@ clear all;
 pfo = PCAFileOperations;
 
 Fbar = GetFbar();
+save('Fbar.mat','Fbar');
 pfo.saveFbar(Fbar);
     
 [trainingFeatureFiles, trainingFeatureFileCount] = pfo.getTrainingFeatures();
@@ -30,7 +31,7 @@ end
 
 pfo.saveDMatrix(D_matrix);
 save('D_matrix.mat','D_matrix');
-k = 100;
+k = 90;
 display('Calculating Sigma...');
 Sigma = 1/(length(fileNames)-1) .* D_matrix' * D_matrix;
 save('Sigma.mat','Sigma');

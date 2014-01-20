@@ -2,12 +2,12 @@ clc;
 clear all;
 pfo = PCAFileOperations;
 fileNames = pfo.getTrainingSetImageNameList();
-Fbar = GetFbar();
+Fbar = importdata('Fbar.mat');
 
 % Test_image = imread('Chinmay_5.JPG');
 % Test_image = imread('Ran_1.JPG');
 
-test_image = 'Roberto_5';
+test_image = 'Roberto_1';
 
 Test_image = pfo.getOriginalImageByName([test_image '.JPG']);
 F_test_img = pfo.getFeatureMatrixByName(test_image);
