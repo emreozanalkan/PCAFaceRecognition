@@ -131,6 +131,11 @@ classdef PCAFileOperations
             feature = PCAFileOperations.ReadFeatureFile(fullPath);
         end
         
+        function [feature] = getFeatureMatrixByName(fileName)
+            fullPath = [PCAFileOperations.dataFolderPath filesep fileName '.txt'];
+            feature = PCAFileOperations.ReadFeatureFile(fullPath);
+        end
+        
         % Returns the feautre matrix of feature file in list by given
         % index
         function [feature] = getFeatureMatrixByIndex(featureList, index)
