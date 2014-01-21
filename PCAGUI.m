@@ -104,6 +104,8 @@ function listboxTestImageList_Callback(hObject, eventdata, handles)
 % display(strcat('Index selected: ', num2str(index_selected)));
 % display(strcat('String Value: ', file_list(index_selected)));
 
+set(handles.listboxTestImageList, 'Enable', 'inactive');
+
 index_selected = get(handles.listboxTestImageList,'Value');
 file_list = get(handles.listboxTestImageList,'String');
 selectedFile = file_list(index_selected);
@@ -111,11 +113,12 @@ selectedFile = file_list(index_selected);
 selectedFile = cellstr(selectedFile);
 selectedFile = selectedFile{1};
 
-display(selectedFile);
-class(selectedFile)
-
 s = strsplit(selectedFile, '.');
 selectedFileName = s{1};
+
+if isempty(selectedFileName)
+    return;
+end
 
 [Test_image, Img1, Img2, Img3, Name1, Name2, Name3, Error] = RecognizingSystem(selectedFileName);
 
@@ -138,6 +141,8 @@ axes(handles.axesRelatedImage3);
 imshow(Img3);
 set(handles.textRelatedImage3Name, 'String', Name3);
 
+set(handles.listboxTestImageList, 'Enable', 'on');
+
 
 
 % --- Executes during object creation, after setting all properties.
@@ -158,18 +163,64 @@ function buttonTrain_Callback(hObject, eventdata, handles)
 % hObject    handle to buttonTrain (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-set(handles.buttonTrain, 'Enable', 'off');
-set(handles.textTrainingMessage, 'Visible', 'on');
 
-RunMeForTraining;
+% Construct a questdlg with three options
 
-set(handles.buttonTrain, 'Enable', 'on');
-set(handles.textTrainingMessage, 'Visible', 'off');
+if  exist('D_matrix.mat', 'file') && ...
+    exist('Fbar.mat', 'file') && ...
+    exist('PCAspace.mat', 'file') && ...
+    exist('Phi.mat', 'file') && ...
+    exist('Sigma.mat', 'file')
+
+choice = questdlg('Would you like to use old training data ?', ...
+	'Yes', 'No');
+% Handle response
+switch choice
+    case 'Yes'
+        h = msgbox('This may take a minute. Please be patient.','!! PCA Training !!', 'help');
+        close(h);
+        DMatrixVars = whos('-file','D_matrix.mat');
+        if ~ismember('D_matrix', {DMatrixVars.name})
+            D_matrix = importdata('D_matrix.mat');
+        end
+        FbarVars = whos('-file','Fbar.mat');
+        if ~ismember('Fbar', {FbarVars.name})
+            Fbar = importdata('Fbar.mat');
+        end
+        PCASpaceVars = whos('-file','PCAspace.mat');
+        if ~ismember('PCAspace', {PCASpaceVars.name})
+            PCAspace = importdata('PCAspace.mat');
+        end
+        PhiVars = whos('-file','Phi.mat');
+        if ~ismember('Phi', {PhiVars.name})
+            Phi = importdata('Phi.mat');
+        end
+        SigmaVars = whos('-file','Sigma.mat');
+        if ~ismember('Sigma', {SigmaVars.name})
+            Sigma = importdata('Sigma.mat');
+        end
+        
+        accuracy = FindAccuracy();
+    case 'No'
+        h = msgbox('This may take several minutes. Please be patient.','!! PCA Training !!', 'help');
+        close(h);
+        set(handles.buttonTrain, 'Enable', 'off');
+        set(handles.textTrainingMessage, 'Visible', 'on');
+        RunMeForTraining;
+        set(handles.buttonTrain, 'Enable', 'on');
+        set(handles.textTrainingMessage, 'Visible', 'off');
+    case 'Cancel'
+        return;
+    otherwise
+        return;
+end
+
+end
+
 set(handles.textAverageTrainSetAccuracy, 'String', ['Training Set Average Accuracy: ', num2str(accuracy, 4)]);
 
+pfo = PCAFileOperations;
 trainingImageList = pfo.getTestSetImageNameList();
 
 set(handles.listboxTestImageList, 'String', trainingImageList,...
-	'Value', 1);
-
-guidata(hObject, handles);
+	'Value', 1);    
