@@ -22,7 +22,7 @@ function varargout = PCAGUI(varargin)
 
 % Edit the above text to modify the response to help PCAGUI
 
-% Last Modified by GUIDE v2.5 21-Jan-2014 15:28:37
+% Last Modified by GUIDE v2.5 21-Jan-2014 20:49:32
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -55,6 +55,21 @@ function PCAGUI_OpeningFcn(hObject, eventdata, handles, varargin)
 % Choose default command line output for PCAGUI
 handles.output = hObject;
 
+
+problem1 = imread('problem1.png');
+
+axes(handles.axesSelectedImage);
+imshow(problem1);
+
+axes(handles.axesRelatedImage1);
+imshow(problem1);
+
+axes(handles.axesRelatedImage2);
+imshow(problem1);
+
+axes(handles.axesRelatedImage3);
+imshow(problem1);
+
 % Update handles structure
 guidata(hObject, handles);
 
@@ -82,6 +97,48 @@ function listboxTestImageList_Callback(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns listboxTestImageList contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from listboxTestImageList
 
+% display('listbox hello!');
+% index_selected = get(handles.listboxTestImageList,'Value');
+% file_list = get(handles.listboxTestImageList,'String');
+% 
+% display(strcat('Index selected: ', num2str(index_selected)));
+% display(strcat('String Value: ', file_list(index_selected)));
+
+index_selected = get(handles.listboxTestImageList,'Value');
+file_list = get(handles.listboxTestImageList,'String');
+selectedFile = file_list(index_selected);
+
+selectedFile = cellstr(selectedFile);
+selectedFile = selectedFile{1};
+
+display(selectedFile);
+class(selectedFile)
+
+s = strsplit(selectedFile, '.');
+selectedFileName = s{1};
+
+[Test_image, Img1, Img2, Img3, Name1, Name2, Name3, Error] = RecognizingSystem(selectedFileName);
+
+n = strsplit(selectedFileName, '_');
+testImageName = n{1};
+
+axes(handles.axesSelectedImage);
+imshow(Test_image);
+set(handles.textSelectedImageName, 'String', testImageName);
+
+axes(handles.axesRelatedImage1);
+imshow(Img1);
+set(handles.textRelatedImage1Name, 'String', Name1);
+
+axes(handles.axesRelatedImage2);
+imshow(Img2);
+set(handles.textRelatedImage2Name, 'String', Name2);
+
+axes(handles.axesRelatedImage3);
+imshow(Img3);
+set(handles.textRelatedImage3Name, 'String', Name3);
+
+
 
 % --- Executes during object creation, after setting all properties.
 function listboxTestImageList_CreateFcn(hObject, eventdata, handles)
@@ -101,3 +158,18 @@ function buttonTrain_Callback(hObject, eventdata, handles)
 % hObject    handle to buttonTrain (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+set(handles.buttonTrain, 'Enable', 'off');
+set(handles.textTrainingMessage, 'Visible', 'on');
+
+RunMeForTraining;
+
+set(handles.buttonTrain, 'Enable', 'on');
+set(handles.textTrainingMessage, 'Visible', 'off');
+set(handles.textAverageTrainSetAccuracy, 'String', ['Training Set Average Accuracy: ', num2str(accuracy, 4)]);
+
+trainingImageList = pfo.getTestSetImageNameList();
+
+set(handles.listboxTestImageList, 'String', trainingImageList,...
+	'Value', 1);
+
+guidata(hObject, handles);

@@ -1,7 +1,7 @@
 clc;
 clear all;
 
-test_image = 'Daniel_S_1';
+test_image = 'Priyanka_5';
 
 [Test_image, Img1, Img2, Img3, Name1, Name2, Name3, Accuracy] = RecognizingSystem(test_image);
 
