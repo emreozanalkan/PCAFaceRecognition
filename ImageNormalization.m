@@ -1,6 +1,7 @@
 function [normImg] = ImageNormalization(OriginalImg, Fimg, Fbar)
 
 img = rgb2gray(OriginalImg);
+img = histeq(img);
 
 [A,b] = GetAB(Fimg, Fbar);
 

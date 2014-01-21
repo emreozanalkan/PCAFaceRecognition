@@ -29,6 +29,7 @@ for i=1:length(fileNames)
     D_matrix(i, :) = reshape(normImg, 1, 4096);
 end
 
+% D_matrix = D_matrix - mean2(D_matrix);
 pfo.saveDMatrix(D_matrix);
 save('D_matrix.mat','D_matrix');
 k = 90;

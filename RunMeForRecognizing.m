@@ -7,7 +7,7 @@ Fbar = importdata('Fbar.mat');
 % Test_image = imread('Chinmay_5.JPG');
 % Test_image = imread('Ran_1.JPG');
 
-test_image = 'Roberto_1';
+test_image = 'Ozan_5';
 
 Test_image = pfo.getOriginalImageByName([test_image '.JPG']);
 F_test_img = pfo.getFeatureMatrixByName(test_image);
