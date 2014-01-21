@@ -45,3 +45,13 @@ Phi = V(:,1:k);
 save('Phi.mat','Phi');
 PCAspace = D_matrix*Phi;
 save('PCAspace.mat','PCAspace');
+
+for i=1:length(fileNames) 
+    C = strsplit(fileNames{i},'.');
+    Name = C(1);
+    [Test_image, Img1, Img2, Img3, Name1, Name2, Name3, Accuracy] = RecognizingSystem(Name);
+    Accuracyarray(i) = Accuracy;
+end
+
+AccuracyAvg = mean(Accuracyarray);
+save('AccuracyAvg.mat','AccuracyAvg');
