@@ -177,8 +177,7 @@ choice = questdlg('Would you like to use old training data ?', ...
 % Handle response
 switch choice
     case 'Yes'
-        h = msgbox('This may take a minute. Please be patient.','!! PCA Training !!', 'help');
-        close(h);
+        q = questdlg('This may take a minute. Please be patient.', '!! PCA Training !!', 'OK', 'OK');
         DMatrixVars = whos('-file','D_matrix.mat');
         if ~ismember('D_matrix', {DMatrixVars.name})
             D_matrix = importdata('D_matrix.mat');
@@ -202,8 +201,7 @@ switch choice
         
         accuracy = FindAccuracy();
     case 'No'
-        h = msgbox('This may take several minutes. Please be patient.','!! PCA Training !!', 'help');
-        close(h);
+        q = questdlg('This may take several minutes. Please be patient.', '!! PCA Training !!', 'OK', 'OK');
         set(handles.buttonTrain, 'Enable', 'off');
         set(handles.textTrainingMessage, 'Visible', 'on');
         RunMeForTraining;
