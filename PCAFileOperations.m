@@ -144,7 +144,8 @@ classdef PCAFileOperations
         end
         
         function [image] = getOriginalImageByName(fileName)
-            fullPath = [PCAFileOperations.dataFolderPath filesep fileName];
+            %fullPath = [PCAFileOperations.dataFolderPath filesep fileName];
+            fullPath = strcat(PCAFileOperations.dataFolderPath, filesep, fileName);
             image = imread(fullPath);
         end
         
@@ -170,6 +171,11 @@ classdef PCAFileOperations
         
         function [fileNameList] = getTrainingSetImageNameList()
             imageFileList = dir([PCAFileOperations.traningSetFolderPath filesep '*.JPG']);
+            fileNameList = {imageFileList.name}';
+        end
+        
+        function [fileNameList] = getTestSetImageNameList()
+            imageFileList = dir([PCAFileOperations.testSetFolderPath filesep '*.JPG']);
             fileNameList = {imageFileList.name}';
         end
         

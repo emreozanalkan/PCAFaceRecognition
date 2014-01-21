@@ -1,12 +1,10 @@
-function [Test_image, Img1, Img2, Img3, Name1, Name2, Name3, Accuracy] = RecognizingSystem(test_image)
+function [Test_image, Img1, Img2, Img3, Name1, Name2, Name3, Error] = RecognizingSystem(test_image)
     pfo = PCAFileOperations;
     fileNames = pfo.getTrainingSetImageNameList();
     Fbar = importdata('Fbar.mat');
-    Test_image = pfo.getOriginalImageByName([test_image '.JPG']);
+    testImagePath = strcat(test_image, '.JPG');
+    Test_image = pfo.getOriginalImageByName(testImagePath);
     F_test_img = pfo.getFeatureMatrixByName(test_image);
-
-    display('F_test_img: ');
-    display(F_test_img);
 
     Index_Distance_Table = FaceRecognization(Test_image,F_test_img,Fbar);
     Name_1 = fileNames{Index_Distance_Table(1,1)};
@@ -25,17 +23,25 @@ function [Test_image, Img1, Img2, Img3, Name1, Name2, Name3, Accuracy] = Recogni
     C = strsplit(Name_3,'_');
     Name3 = C(1);
     
-    in = 0;
-    if(~strcmp(Name1,TestImageName))
-        in = in + 1;
-    end
-    if(~strcmp(Name2,TestImageName))
-        in = in + 1;
-    end
-    if(~strcmp(Name3,TestImageName))
-        in = in + 1;
-    end
+%     in = 0;
+%     if(~strcmp(Name1,TestImageName))
+%         in = in + 1;
+%     end
+%     if(~strcmp(Name2,TestImageName))
+%         in = in + 1;
+%     end
+%     if(~strcmp(Name3,TestImageName))
+%         in = in + 1;
+%     end
+% 
+%     Accuracy = (1 - in/3)*100;
 
-    Accuracy = (1 - in/3)*100;
+
+
+    if(~strcmp(Name1, TestImageName))
+        Error = 1;
+    else
+        Error = 0;
+    end
     
 end
