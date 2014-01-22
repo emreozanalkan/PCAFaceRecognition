@@ -200,6 +200,7 @@ switch choice
         end
         
         accuracy = FindAccuracy();
+        return;
     case 'No'
         q = questdlg('This may take several minutes. Please be patient.', '!! PCA Training !!', 'OK', 'OK');
         set(handles.buttonTrain, 'Enable', 'off');
