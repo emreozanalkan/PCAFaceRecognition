@@ -5,8 +5,8 @@
 \usepackage{amssymb}
 \usepackage{theorem}
 \usepackage{bm}
+\usepackage{float}
 \usepackage{hyperref}
-
 
 \topmargin=0cm
 \textheight=700pt
@@ -108,14 +108,14 @@ We use No.1 and No.5 images of each person as test images and the rest are train
 \\
 
 We are unable to get a ideal result which means three of them are matched, however it is acceptable if the first image is matched. We compute the accuracy which is the ratio of all results that first image is matched. The accuracy we got is 69.23$ \% $. Result of our matlab code shown by following figure.
-\begin{figure}[h]
+\begin{figure}[H]
 \centering
 \includegraphics[width=0.7\linewidth]{./PCA2.png}
 \includegraphics[width=0.7\linewidth]{./PCA4.png}
 \includegraphics[width=0.7\linewidth]{./PCA5.png}
 \caption{}
 \end{figure}
-\\
+
 
 We also change the number of principal components $ (mark \ as \ k ) $. When $ k < 10 $, accuracy decrease effectively when we reduce $ k $. When $ k > 100 $, it has no effect on accuracy. In our finial result, we define $ k = 90 $.
 
@@ -134,5 +134,295 @@ We also got some deeper understanding of the application of some linear algebra 
 		\item \url{https://en.wikipedia.org/wiki/Eigenvector}
 		\item Alper Akcoltekin - Ozan Gonenc (old students)
 	\end{enumerate}
+	
+\section*{Matlab Code}
+	\subsection*{Get Fbar}
+	
+\begin{verbatim}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%This function is to find the Fbar by iteration
+%Note:  Need the extra function to read Fi where Fi is the feature of No.i
+%       image. example: Fi = readF(index)
+%Fpre is defined on the paper
+%input: threshold of error, MaxIterations for limit the interations
+%output: Fbar for normalization
+%Last modify time: 1/18/2014
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function [Fbar] = GetFbar(threshold,MaxIterations)
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %check the input
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
+    if (nargin == 2)
+        label = ['threshold = ',int2str(threshold)];
+        disp(label);
+        label = ['MaxIterations = ',int2str(MaxIterations)];
+        disp(label);
+    end
+
+    if (nargin == 1)
+        MaxIterations = 30;
+        label = ['threshold = ',int2str(threshold)];
+        disp(label);
+        disp('MaxIterations = 30');
+    end
+    
+    if (nargin == 0)%if input is wrong
+        MaxIterations = 30;
+        threshold = 1;
+        disp('threshold = 1');
+        disp('MaxIterations = 30');
+    end
+    
+    pfo = PCAFileOperations; % PCA File Operations
+    
+    Fpre = pfo.getPredefinedFeatureLocations();
+    
+    [trainingFeatureFiles, trainingFeatureFileCount] = pfo.getTrainingFeatures();
+    
+    [allFeatureFiles, allFeatureFileCount] = pfo.getAllFeatures();
+    
+    NumberOfTrainFeature = trainingFeatureFileCount;
+    
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %Step 1: 
+    %initialize Fbar = F1
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    F1 = pfo.getFeatureMatrixByIndex(trainingFeatureFiles, 1);
+    Fbar = F1;
+    
+    IterationCounter = 0;
+    Error = 30;
+    Prve_Error = Error;
+    while(IterationCounter < MaxIterations)
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %Step 2:
+        %Get A and b from Fpre = A*Fbar + b
+        %Get Fbar = A*Fbar + b
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        IterationCounter = IterationCounter + 1;
+        [A,b] = GetAB(Fbar, Fpre);
+        Fbar = FeatureTransformation(A, b, Fbar);
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %Step 3:
+        %Find Fi_dash of all Fi
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        Fsum = zeros(5,2);
+        for i = 1:NumberOfTrainFeature
+            Fi = pfo.getFeatureMatrixByIndex(trainingFeatureFiles, i);
+            [A,b] = GetAB(Fi, Fbar);
+            Fi_dash = FeatureTransformation(A, b, Fi);
+            Fsum = Fsum + Fi_dash;
+        end
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %Step 4:
+        %Update new Fbar by averaging Fi_dash
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        Fbar_t = Fsum / NumberOfTrainFeature;
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %Step 5:
+        %error between Fbar_t and Fbar_(t-1)
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        Error = sum(sqrt(sum(((Fbar_t' - Fbar').^2))));
+        if(Error < threshold)
+            disp('Fbar Found...');
+            break;
+        end
+        %check if it is necessary to continue iteration
+        if(Prve_Error <= Error) 
+            label = ['Minimum Error at iterations = ',int2str(IterationCounter-1),'...Iteration stoped...'];
+            disp(label);
+            break;
+        else
+            label = ['Iterations = ',int2str(IterationCounter),' Error = ',num2str(Error)];
+            disp(label);
+            Fbar = Fbar_t;
+        end
+        Prve_Error = Error;
+    end
+end
+\end{verbatim}
+
+\subsection*{Training}
+\begin{verbatim}
+display('Training is started. This may take several minutes. Please wait...');
+
+pfo = PCAFileOperations;
+
+Fbar = GetFbar();
+save('Fbar.mat','Fbar');
+pfo.saveFbar(Fbar);
+    
+[trainingFeatureFiles, trainingFeatureFileCount] = pfo.getTrainingFeatures();
+
+%traningSetFolder = pfo.getTrainingSetFolderPath();
+
+%normalizedSetFolder = pfo.getNormalizedSetFolderPath();
+
+%dirOutput = dir(fullfile(traningSetFolder, '*.jpg'));
+
+%fileNames={dirOutput.name}';
+
+fileNames = pfo.getTrainingSetImageNameList();
+
+D_matrix = zeros(length(fileNames),4096);
+
+for i=1:length(fileNames)
+    Fimg = pfo.getFeatureMatrixByIndex(trainingFeatureFiles, i);
+    Img = pfo.getTrainingImageByName(fileNames{i});
+    normImg = ImageNormalization(Img, Fimg, Fbar);
+    pfo.saveNormalizedImage(normImg, fileNames{i});
+    D_matrix(i, :) = reshape(normImg, 1, 4096);
+end
+
+
+
+pfo.saveDMatrix(D_matrix);
+save('D_matrix.mat','D_matrix');
+k = 50;
+display('Calculating Sigma...');
+Sigma = 1/(length(fileNames)-1) .* D_matrix' * D_matrix;
+save('Sigma.mat','Sigma');
+display('Starting SVD process. This may take several minutes. Please wait...');
+tic;
+[U,S,V] = svd(Sigma);
+display('Total time for SVD: ');
+toc;
+Phi = V(:,1:k);
+save('Phi.mat','Phi');
+PCAspace = D_matrix*Phi;
+save('PCAspace.mat','PCAspace');
+
+display('Training is finished.');
+
+
+
+accuracy = FindAccuracy();
+\end{verbatim}
+
+\subsection*{Recognizing System}
+\begin{verbatim}
+function [Test_image, Img1, Img2, Img3, Name1, Name2, Name3, Error] = RecognizingSystem(test_image)
+    pfo = PCAFileOperations;
+    fileNames = pfo.getTrainingSetImageNameList();
+    Fbar = importdata('Fbar.mat');
+    testImagePath = strcat(test_image, '.JPG');
+    Test_image = pfo.getOriginalImageByName(testImagePath);
+    F_test_img = pfo.getFeatureMatrixByName(test_image);
+
+    Index_Distance_Table = FaceRecognization(Test_image,F_test_img,Fbar);
+    Name_1 = fileNames{Index_Distance_Table(1,1)};
+    Img1 = pfo.getTrainingImageByName(Name_1);
+    Name_2 = fileNames{Index_Distance_Table(2,1)};
+    Img2 = pfo.getTrainingImageByName(Name_2);
+    Name_3 = fileNames{Index_Distance_Table(3,1)};
+    Img3 = pfo.getTrainingImageByName(Name_3);
+    
+    C = strsplit(test_image,'_');
+    TestImageName = C(1);
+    C = strsplit(Name_1,'_');
+    Name1 = C(1);
+    C = strsplit(Name_2,'_');
+    Name2 = C(1);
+    C = strsplit(Name_3,'_');
+    Name3 = C(1);
+
+    if(~strcmp(Name1, TestImageName))
+        Error = 1;
+    else
+        Error = 0;
+    end
+    
+end
+\end{verbatim}
+
+\subsection*{Image Normalization}
+\begin{verbatim}
+function [normImg] = ImageNormalization(OriginalImg, Fimg, Fbar)
+
+img = rgb2gray(OriginalImg);
+%img = histeq(img);
+
+[A,b] = GetAB(Fimg, Fbar);
+
+normImg = uint8(zeros(64, 64));
+
+ for i=1:64
+      for j=1:64       
+          % solve the equation xy64 = A*xy + b to obtain the pixel 
+          %positions in the bigger image
+          xy = (pinv(A)*( [ i; j ] - b ));
+          
+          % extract the x and y coordinate 
+          x240 = int32(xy(1,:));
+          y320 = int32(xy(2,:));
+          
+          % Although very rare, these values can fall down to negative values. So if it
+          % happens, just make it zero. One pixel won't make a huge difference.
+          if(x240 <= 0)
+              x240 = 1;
+          end
+          
+          if(y320 <= 0)
+              y320 = 1;
+          end
+          
+          if(x240 > 240)
+              x240 = 240;
+          end
+          
+          if(y320 >320)
+              y320 = 320;
+          end
+          % copy the value of the pixel in the bigger image to the
+          % normalized image
+          normImg(i,j) = uint8(img(y320, x240));
+      end
+      
+ end
+ 
+ normImg = normImg';
+ 
+end
+\end{verbatim}
+
+\subsection*{Get AB}
+\begin{verbatim}
+function [A,b] = GetAB(F, Fp)
+%     AB = zeros(3,2);
+    AB = pinv([F, [1;1;1;1;1]]) * Fp;
+    A = AB(1:2,:);
+    A = A';
+    B = AB(3,:);
+    b = B';
+end
+\end{verbatim}
+
+\subsection*{Feature Transformation}
+\begin{verbatim}
+function [F_of_norm] = FeatureTransformation(A, b, F_of_img)
+    AB = [A'; b'];
+    F_of_norm = [F_of_img, [1;1;1;1;1]] * AB;
+end
+\end{verbatim}
+
+\subsection*{Face Recognization}
+\begin{verbatim}
+function [Index_Distance] = FaceRecognization(Test_image,F_test_img,Fbar)
+    Phi = importdata('Phi.mat');
+    PCAspace = importdata('PCAspace.mat');
+    img = ImageNormalization(Test_image,F_test_img,Fbar);
+    Xj = reshape(img,1,4096);
+    oslash_j = double(Xj) * double(Phi);
+    [m,n] = size(PCAspace);
+    Index_Distance = zeros(m,2);
+    for i = 1:m
+        Index_Distance(i,1) = i;
+        Index_Distance(i,2) = sqrt(sum((PCAspace(i,:) - oslash_j).^2));
+    end
+    Index_Distance = sortrows(Index_Distance,2);
+end
+\end{verbatim}
 
 \end{document}

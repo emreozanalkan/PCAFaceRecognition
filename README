@@ -1,0 +1,11 @@
+* Run "PCAGUI" to start program.
+* Frist you need to train program, please click "Train" button.
+* After training, all test set images will be in the list in UI.
+* Select the test image name, it will show 3 close match ordered by accuracy.
+
+
+predefinedFeatures.txt => Predefined features. This should be in the root.
+data => Containing all images and their features.
+data/test_set => Contains test images and their features.
+data/training_set => Contains training images and their features
+data/normalized_set => Normalization image output folder.
