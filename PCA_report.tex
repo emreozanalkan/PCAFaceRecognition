@@ -35,7 +35,7 @@ Ozan, Ran\\
 In this project, we implemented a face recognition system by using principal component analysis, which is known as $ PCA $. $ PCA $ method provide a mathematical way to reduce the dimension of problem. 
 \\
 
-Since the most elements of a facial image are highly correlated, it is better to extract a set of interesting and discriminative feature of a facial image. Mathematically speaking, we transform the correlated data to independent data. To implement the transform, we employed some linear algebra method such as SVD. The main idea is to obtain $ Eigenfaces $ that every face can be regard as a linear combination of these eigenfaces. Then the face recognition problem convert to a mathematic problem: what is the linear combination of a face? In other words, it simplify a problem from 2D to 1D.
+Since the most elements of a facial image are highly correlated, it is better to extract a set of interesting and discriminative feature of a facial image. Mathematically speaking, we transform the correlated data to independent data. To implement the transform, we employed some linear algebra method such as SVD $ (Chapter 3) $. The main idea is to obtain $ Eigenfaces $ that every face can be regard as a linear combination of these eigenfaces $ (Chapter 4) $. Then the face recognition problem convert to a mathematic problem: what is the linear combination of a face? In other words, it simplify a problem from 2D to 1D.
 
 \section*{ $\llcorner$  Chapter 2: Normalization $\urcorner$}
 \subsection*{How to normalized images}
@@ -90,7 +90,7 @@ It is very important to get an appropriate $ \overline{F} $. We calculate $ \ove
   We converted our 64 by 64 normalized images $X_{i}$  into row vector sized 1x4096 and constructed matrix $D_{pxd}$(p = number of images, d = 64x64) that each row corresponds to $X_{i}$. Then we defined k between 50 and 100 to \emph{k}th largest eigen values.\\
   \\Before computing the PCA, we computed the covariance matrix of D as follows:
   	$$ \Sigma = \frac{1}{p-1} D^{T} D $$
-  	Then we used matlab's "svd()" function to get eigen values from $ \Sigma $ matrix. This process in our training is taking the most time. We put biggest k eigen values to $\Phi$.
+  	Then we used matlab's ``svd()" function to get eigenvectors from $ \Sigma $ matrix. This process in our training is taking the most time. We put k eigenvectors corresponding to biggest k eigenvalues to $\Phi$.
   	\\We calculated PCA space by;
   	$$ \phi_{i} = X_{i} . \Phi $$\\
   	
@@ -101,10 +101,27 @@ It is very important to get an appropriate $ \overline{F} $. We calculate $ \ove
 blablabla...
 
 \section*{ $\llcorner$  Chapter 5: Experimental Result and Analysis $\urcorner$}
-blablabla...
+We use No.1 and No.5 images of each person as test images and the rest are train images. For each test image, we calculate the distance of feature vector between test image and train images. Then we apply ascending sort on the train images by distance. Since we have three train images for each person, we shown top three of them.
+\\
+
+We are unable to get a ideal result which means three of them are matched, however it is acceptable if the first image is matched. We compute the accuracy which is the ratio of all results that first image is matched. The accuracy we got is 69.23$ \% $. Result of our matlab code shown by following figure.
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.7\linewidth]{./PCA2.png}
+\includegraphics[width=0.7\linewidth]{./PCA4.png}
+\includegraphics[width=0.7\linewidth]{./PCA5.png}
+\caption{}
+\end{figure}
+\\
+
+We also change the number of principal components $ (mark \ as \ k ) $. When $ k < 10 $, accuracy decrease effectively when we reduce $ k $. When $ k > 100 $, it has no effect on accuracy. In our finial result, we define $ k = 90 $.
 
 \section*{ $\llcorner$  Chapter 6: Summary $\urcorner$}
-blablabla...
+
+This project help us understand a great idea that PCA provide: transform the data from correlated to independent. From image processing point of view, PCA is similar with Fourier transform which represent an image as the combination of some principal spectrum, Face recognition based on PCA actually represent a face by the combination of eigenfaces. It is a powerful method to reduce the dimension of problem.
+\\
+
+We also got some deeper understanding of the application of some linear algebra tools such as eigenvalue, eigenvector, SVD, etc. Specifically, we got the point that why and how we use SVD. 
 
 \section*{ $\llcorner$  References $\urcorner$}
 
