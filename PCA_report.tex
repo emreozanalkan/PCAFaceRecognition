@@ -77,15 +77,25 @@ Until now, the problem convert to solve $ Ax=b $ in linear algebra. Since we got
 \subsection*{How to find $ \overline{F} $}
 It is very important to get an appropriate $ \overline{F} $. We calculate $ \overline{F} $ by following steps:
 \begin{itemize}
-\item Step 1:
-\item Step 2:
-\item Step 3:
-\item Step 4:
-\item Step 5:
+\item Step 1: We initialize $ \overline{F} $ with first image's feature to find average of all.
+\item Step 2: Finding transformation that project $ \overline{F} $  to predefined position in 64x64 window. Then we can find this affine transformation as A and b matrices that has 6 parameters, and we apply this transformation to $ \overline{F} $.
+\item Step 3: For each image feature $F_{i}$, we computing the A and b matrices for affine transformation that projecting  $ \overline{F} $ to $F_{i}$. 
+\item Step 4: We change $ \overline{F} $ to averaged projected feature locations that we calculated previous step.
+\item Step 5: If error between $ \overline{F}_{t} $ - $ \overline{F}_{t-1} $ is less than our threshold, we go back to step 2.
 \end{itemize}
 
 \section*{ $\llcorner$  Chapter 3: Principal Component Analysis $\urcorner$}
-blablabla...
+  We used PCA to transform our correlated data set into smaller uncorrelated data set. So PCA helped us on reducing the large dimensions of data set into smaller dimensions of it. After finding $ \overline{F} $, we followed these steps:\\
+  \\
+  We converted our 64 by 64 normalized images $X_{i}$  into row vector sized 1x4096 and constructed matrix $D_{pxd}$(p = number of images, d = 64x64) that each row corresponds to $X_{i}$. Then we defined k between 50 and 100 to \emph{k}th largest eigen values.\\
+  \\Before computing the PCA, we computed the covariance matrix of D as follows:
+  	$$ \Sigma = \frac{1}{p-1} D^{T} D $$
+  	Then we used matlab's "svd()" function to get eigen values from $ \Sigma $ matrix. This process in our training is taking the most time. We put biggest k eigen values to $\Phi$.
+  	\\We calculated PCA space by;
+  	$$ \phi_{i} = X_{i} . \Phi $$\\
+  	
+  	After all, now we can store all our training images in the PCA space and easily search them to find closest matches.
+  
 
 \section*{ $\llcorner$  Chapter 4: Recognition $\urcorner$}
 blablabla...
