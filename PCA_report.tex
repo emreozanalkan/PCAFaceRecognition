@@ -98,7 +98,8 @@ It is very important to get an appropriate $ \overline{F} $. We calculate $ \ove
   
 
 \section*{ $\llcorner$  Chapter 4: Recognition $\urcorner$}
-blablabla...
+  In face recognition part we created a function called ``RecognizingSystem()"; it has one input: test image name, e.g. 'Ran\_1', and return us a test image itself, and related 3 images we found in accuracy order, and accuracy 0 or 1 if first image is correct.\\
+  \\In this function, first we use $ \overline{F} $ to normalize our image. Then we use our $\Phi$ to carry it to our PCA space and get its corresponding feature vector $ \phi_{j} $. Then we calculating eclidean distance between $ \phi_{j} $ and all feature vectors $ \phi_{i} $ and order our result ascending according to this distance. We pick the top 3 row, and show the result as our face recognition algorithm. So basically we used the Eigenface idea of set of eigenvectors to detect face that created by Turk and Pentland.
 
 \section*{ $\llcorner$  Chapter 5: Experimental Result and Analysis $\urcorner$}
 We use No.1 and No.5 images of each person as test images and the rest are train images. For each test image, we calculate the distance of feature vector between test image and train images. Then we apply ascending sort on the train images by distance. Since we have three train images for each person, we shown top three of them.
