@@ -12,3 +12,11 @@
 
 # Simulink Code Generation
 slprj/
+
+# Matlab .mat files
+*.mat
+
+# Latex Report
+*.aux
+*.log
+*.synctex.gz
