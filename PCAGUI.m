@@ -200,7 +200,6 @@ switch choice
         end
         
         accuracy = FindAccuracy();
-        return;
     case 'No'
         q = questdlg('This may take several minutes. Please be patient.', '!! PCA Training !!', 'OK', 'OK');
         set(handles.buttonTrain, 'Enable', 'off');
@@ -213,15 +212,14 @@ switch choice
     otherwise
         return;
 end
-
-end
-
+else
         q = questdlg('This may take several minutes. Please be patient.', '!! PCA Training !!', 'OK', 'OK');
         set(handles.buttonTrain, 'Enable', 'off');
         set(handles.textTrainingMessage, 'Visible', 'on');
         RunMeForTraining;
         set(handles.buttonTrain, 'Enable', 'on');
         set(handles.textTrainingMessage, 'Visible', 'off');
+end
 
 set(handles.textAverageTrainSetAccuracy, 'String', ['Training Set Average Accuracy: ', num2str(accuracy, 4)]);
 
